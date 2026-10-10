@@ -1,0 +1,104 @@
+# =============================================================================
+# pyproject.toml - 文件内容合并工具
+# =============================================================================
+# 说明：
+#   - 采用 PEP 621 标准的 [project] 表声明项目元数据
+#   - 使用 uv_build 作为构建后端（uv 默认推荐）
+#   - 使用 src 布局：源码位于 src/merge_tool/
+#   - [project.scripts] 声明命令行入口，映射到 merge_tool.app:main
+# =============================================================================
+
+[project]
+name = "merge-tool"
+version = "2.0.0"
+description = "高性能文件内容合并工具（GUI 版），支持目录树勾选、平铺展开、正则筛选、拖放加载、多编码检测。"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = { text = "MIT" }
+authors = [
+    { name = "XXNote" },
+]
+keywords = ["file", "merge", "gui", "customtkinter", "encoding"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Win32 (MS Windows)",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: Chinese (Simplified)",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Utilities",
+]
+
+# 运行期依赖
+dependencies = [
+    "chardet>=5.2.0",
+    "pyside6>=6.12.0",
+]
+
+# =============================================================================
+# 命令行入口脚本
+# =============================================================================
+# 说明：
+#   安装后可直接执行 `merge-tool` 或 `uv run merge-tool`。
+#   右侧格式为 "包名.模块:函数名"。
+#   我们的 main() 位于 src/merge_tool/app.py，因此是 merge_tool.app:main
+# =============================================================================
+[project.scripts]
+merge-tool = "merge_tool.app:main"
+
+# =============================================================================
+# 可选依赖组
+# =============================================================================
+[project.optional-dependencies]
+# 打包为 exe 时需要（uv add --dev pyinstaller 也行，这里只是留个备用入口）
+build = ["pyinstaller>=6.0.0"]
+
+# =============================================================================
+# 构建系统
+# =============================================================================
+# uv_build 是 uv 官方提供的轻量构建后端。
+# src 布局下需要显式声明 module-root 和 module-name：
+#   module-root = "src"          源码根目录
+#   module-name = "merge_tool"   包目录名（相对于 module-root）
+# =============================================================================
+[build-system]
+requires = ["uv_build>=0.9.0,<0.13.0"]
+build-backend = "uv_build"
+
+# =============================================================================
+# uv 专属配置
+# =============================================================================
+[tool.uv]
+# 声明这是一个可安装的包（默认即为 true，显式写出更清晰）
+package = true
+
+[tool.uv.build-backend]
+# src 布局：告诉 uv_build 到 src 目录下找 merge_tool 包
+module-root = "src"
+module-name = "merge_tool"
+
+# =============================================================================
+# 开发工具配置
+# =============================================================================
+[tool.ruff]
+# 若以后引入 ruff 做 lint，可参考此配置
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM"]
+ignore = ["E501"]
+
+[tool.pyright]
+# 若使用 pyright / pylance 做类型检查
+pythonVersion = "3.11"
+include = ["src"]
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.22.3",
+]
